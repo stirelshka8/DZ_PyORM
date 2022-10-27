@@ -34,10 +34,27 @@ def json_input_pos():
     ext_data_json = __json_file_read()
     for parametr in ext_data_json:
         if parametr['model'] == 'publisher':
-            par_pub = Publisher(name=parametr['fields']['name'])
-            sessions.add(par_pub)
+            parametr_publisher = Publisher(name=parametr['fields']['name'])
+            sessions.add(parametr_publisher)
             sessions.commit()
-
+        elif parametr['model'] == 'book':
+            parametr_book = Book(title=parametr['fields']['title'], id_published=parametr['fields']['id_publisher'])
+            sessions.add(parametr_book)
+            sessions.commit()
+        elif parametr['model'] == 'shop':
+            parametr_shop = Shop(name=parametr['fields']['name'])
+            sessions.add(parametr_shop)
+            sessions.commit()
+        elif parametr['model'] == 'stock':
+            parametr_stock = Stock(id_book=parametr['fields']['id_book'], id_shop=parametr['fields']['id_shop'],
+                                   count=parametr['fields']['count'])
+            sessions.add(parametr_stock)
+            sessions.commit()
+        elif parametr['model'] == 'sale':
+            parametr_sale = Sale(id_stock=parametr['fields']['id_stock'], price=parametr['fields']['price'],
+                                 date_sale=parametr['fields']['date_sale'], count=parametr['fields']['count'])
+            sessions.add(parametr_sale)
+            sessions.commit()
 
 
 if __name__ == "__main__":
@@ -50,4 +67,3 @@ if __name__ == "__main__":
     json_input_pos()
     # Закрываем сессию
     sessions.close()
-
