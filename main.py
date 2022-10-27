@@ -19,6 +19,20 @@ typedb = config["POSTGRESQL"]["TYPE"]
 connectiondb = typedb + '://' + userdb + ':' + passdb + '@' + hostdb + ':' + portdb + '/' + namedb
 
 
+# Цветной текст
+
+def cprint_upred(text):
+    print("\033[1m\033[31m{}\033[0m".format(text))
+
+
+def cprint_yellow(text):
+    print("\033[33m{}\033[0m".format(text))
+
+
+def cprint_blue(text):
+    print("\033[34m{}\033[0m".format(text))
+
+
 # print(connectiondb)
 
 # Функция извлечения данных из json файла
@@ -57,6 +71,36 @@ def json_input_pos():
             sessions.commit()
 
 
+def out_publisher():
+    cprint_yellow("Для вывода книг написанных издателем введите ниже его ID номер")
+    qeu_pub = sessions.query(Publisher)
+    cprint_blue("ID | Издатель")
+    for data_pub in qeu_pub.all():
+        print(f" {data_pub.id} | {data_pub.name}")
+    id_publis = int(input("\nВведите ID - "))
+    qeu_all = sessions.query(Publisher).join(Book.publish).filter(Publisher.id == id_publis)
+    # print(qeu_all)
+    for data_pub_all in qeu_all.all():
+        cprint_blue(f"Издатель - {data_pub_all.name}")
+        cprint_blue(f"Книги:")
+        for data_book in data_pub_all.boo:
+            cprint_yellow(data_book.title)
+
+
+def out_sale_pub():
+    data_dict = {}
+    qeu_sp = sessions.query(Shop.name, Publisher.name).join(Shop.stoc).join(Stock.boo).join(Book.publish)
+    for data_session in qeu_sp.all():
+        shop, publish = data_session
+        if publish not in data_dict.keys():
+            temp_list = {publish: shop}
+            data_dict.update(temp_list)
+        else:
+            if shop not in data_dict[publish]:
+                data_dict[publish] = data_dict[publish] + ',' + shop
+    return data_dict
+
+
 if __name__ == "__main__":
     # Создаем подключение к базе данных
     engine = sqlalchemy.create_engine(connectiondb)
@@ -65,5 +109,8 @@ if __name__ == "__main__":
     sessions = Session()
     # Заполняем базу из json файла
     json_input_pos()
+    cprint_upred("Выборка магазинов, продающих целевого издателя")
+    print(out_sale_pub())
+    out_publisher()
     # Закрываем сессию
     sessions.close()
