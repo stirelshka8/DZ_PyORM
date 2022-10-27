@@ -1,4 +1,4 @@
-import configparser, sqlalchemy, json, os
+import configparser, sqlalchemy, json, os, psycopg2
 from sqlalchemy.orm import sessionmaker
 from model import Publisher, Book, Shop, Stock, Sale, tables_create
 
@@ -22,12 +22,22 @@ connectiondb = typedb + '://' + userdb + ':' + passdb + '@' + hostdb + ':' + por
 # print(connectiondb)
 
 # Функция извлечения данных из json файла
-def json_file():
+def __json_file_read():
     with open('tests_data.json', 'r', encoding='UTF-8') as open_file:
         ext_data = json.load(open_file)
         # print(ext_data)
+    return ext_data
 
-        return ext_data
+
+# Функция добавления данных из json файла
+def json_input_pos():
+    ext_data_json = __json_file_read()
+    for parametr in ext_data_json:
+        if parametr['model'] == 'publisher':
+            par_pub = Publisher(name=parametr['fields']['name'])
+            sessions.add(par_pub)
+            sessions.commit()
+
 
 
 if __name__ == "__main__":
@@ -36,3 +46,8 @@ if __name__ == "__main__":
     tables_create(engine)
     Session = sessionmaker(bind=engine)
     sessions = Session()
+    # Заполняем базу из json файла
+    json_input_pos()
+    # Закрываем сессию
+    sessions.close()
+
