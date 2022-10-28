@@ -11,6 +11,19 @@ configpath = "confdb.conf"
 config = configparser.ConfigParser()
 config.read(configpath)
 
+"""
+Необходим таккая структура файла confdb.conf
+
+[POSTGRESQL]
+name=netology_db
+user=netology
+password=123456
+host=netology.ru
+port=5432
+type=postgresql
+"""
+
+
 # Читаем параметры подключеия к базе из файла конфигурации
 namedb = config["POSTGRESQL"]["NAME"]
 userdb = config["POSTGRESQL"]["USER"]
