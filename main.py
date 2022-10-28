@@ -1,5 +1,9 @@
-import configparser, sqlalchemy, json, os, psycopg2
+import configparser
+import json
+import sqlalchemy
+
 from sqlalchemy.orm import sessionmaker
+
 from model import Publisher, Book, Shop, Stock, Sale, tables_create
 
 # Подключаем configparser
@@ -88,6 +92,7 @@ def out_publisher():
 
 
 def out_sale_pub():
+    cprint_upred("Выборка магазинов, продающих целевого издателя")
     data_dict = {}
     qeu_sp = sessions.query(Shop.name, Publisher.name).join(Shop.stoc).join(Stock.boo).join(Book.publish)
     for data_session in qeu_sp.all():
@@ -109,7 +114,6 @@ if __name__ == "__main__":
     sessions = Session()
     # Заполняем базу из json файла
     json_input_pos()
-    cprint_upred("Выборка магазинов, продающих целевого издателя")
     print(out_sale_pub())
     out_publisher()
     # Закрываем сессию
